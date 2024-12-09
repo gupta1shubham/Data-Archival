@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: scheduler-service
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: archivalTask:org.fortinet.schedulerservice.model.TaskMessage
+        retries: 3
+        spring.json.add.type.headers: false
+        acks: all
+        batch-size: 16384
+        buffer-memory: 33554432
+        compression.type: snappy
+
+config:
+  service:
+    url: http://configuration-service:8080
+
+scheduler:
+  check-interval: 60000 # 1 minute
+
+kafka:
+  topics:
+    archival-tasks: archival-tasks

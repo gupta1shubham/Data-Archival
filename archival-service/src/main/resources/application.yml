@@ -1,0 +1,51 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: archival-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: org.fortinet.schedulerservice.model.TaskMessage
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.use.type.headers: false
+        isolation.level: read_committed
+      listener:
+        ack-mode: MANUAL_IMMEDIATE
+        concurrency: 3
+        type: BATCH
+
+  datasource:
+    primary:
+      url: jdbc:postgresql://postgres:5432/primarydb
+      username: postgres
+      password: postgres
+      driverClassName: org.postgresql.Driver
+    archival:
+      url: jdbc:postgresql://postgres:5432/archivaldb
+      username: postgres
+      password: postgres
+      driverClassName: org.postgresql.Driver
+  application:
+    name: archival-service
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+archival:
+  batch:
+    size: 1000
+  delete:
+    batch-size: 500
+    retention-days: 30
+server:
+  port: 8083
+kafka:
+  topics:
+    archival-tasks: archival-tasks

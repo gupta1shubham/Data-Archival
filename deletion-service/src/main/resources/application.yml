@@ -1,0 +1,43 @@
+# application.yml
+spring:
+  application:
+    name: deletion-service
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/archivaldb
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: deletion-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: org.fortinet.schedulerservice.model.TaskMessage
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.use.type.headers: false
+        isolation.level: read_committed
+      listener:
+        ack-mode: MANUAL_IMMEDIATE
+        concurrency: 3
+        type: BATCH
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+kafka:
+  topics:
+    deletion-tasks: deletion-tasks
+
+logging:
+  level:
+    org.fortinet.deletion: INFO
+    org.springframework.kafka: INFO
+server:
+  port: 8080
