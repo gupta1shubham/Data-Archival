@@ -21,11 +21,9 @@ The system consists of **6 key microservices** and supporting components like th
 
 ### **Supporting Components**
 
--   **Source Database**: The main application database (**PostgreSQL** or **MySQL**).
--   **Archival Database**: Secondary storage for archived data (**PostgreSQL**, **Amazon S3**, etc.).
--   **Message Broker**: Handles communication between services (**Kafka** or **RabbitMQ**).
--   **Monitoring & Logging**: Tracks performance, errors, and operational metrics (**Prometheus**, **Grafana**, **ELK stack**).
--   **Distributed Tracing**: Traces microservice requests end-to-end (**OpenTelemetry**).
+-   **Source Database**: The main application database (**PostgreSQL**).
+-   **Archival Database**: Secondary storage for archived data (**PostgreSQL**).
+-   **Message Broker**: Handles communication between services (**Kafka**).
 
 * * * * *
 
@@ -46,19 +44,6 @@ The system consists of **6 key microservices** and supporting components like th
 -   **POST /api/configs** --- Configure archival rules for a table.
 -   **GET /api/configs/enabled** --- Get the rules for a specific table.
 
-**Data Schema**
-
-sql
-
-Copy code
-
-`CREATE TABLE archival_criteria (
-    table_name VARCHAR(255) PRIMARY KEY,
-    archive_after_days INT,
-    delete_after_days INT
-);`
-
-* * * * *
 
 ### **2\. Scheduler Service**
 
@@ -102,20 +87,6 @@ Copy code
 3.  **Transfers the data** to the **Archival Database** in bulk (batch processing).
 4.  Updates the **job status** (completed/failed) in the **Job Tracking Table**.
 
-**Job Tracking Table**
-
-sql
-
-Copy code
-
-`CREATE TABLE archive_jobs (
-    job_id UUID PRIMARY KEY,
-    table_name VARCHAR(255),
-    status ENUM('PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED'),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);`
-
-* * * * *
 
 ### **4\. Deletion Service**
 
@@ -123,9 +94,6 @@ Copy code
 
 -   Deletes old data from the source and archival databases.
 
-**API Endpoints (Internal Only)**
-
--   **POST /api/delete/{tableName}** --- Trigger deletion for a specific table.
 
 **Key Features:**
 
